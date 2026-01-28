@@ -1,16 +1,20 @@
 package org.example.chatting;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 @Controller
+@RequiredArgsConstructor
 public class ChatController {
 
+    private final SimpMessagingTemplate messagingTemplate;
+
     @MessageMapping("/chat.send")
-    @SendTo("/sub/chat")
-    public ChatMessage send(
+    public void send(
         ChatMessage message,
         SimpMessageHeaderAccessor headerAccessor
     ) {
@@ -20,7 +24,7 @@ public class ChatController {
         System.out.println("sessionId = " + sessionId);
         System.out.println("content   = " + message.getContent());
 
-        return message;
+        messagingTemplate.convertAndSend("/sub/chat", message);
     }
 }
 
